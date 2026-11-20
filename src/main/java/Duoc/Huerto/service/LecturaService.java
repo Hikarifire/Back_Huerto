@@ -29,8 +29,9 @@ public class LecturaService {
             Sector sector = sectores.findById(request.sectorId()).orElseThrow(() -> new RecursoNoEncontradoException("Sector no encontrado."));
             lectura.setSector(sector);
         }
+        lectura.setHumedadAmbiental(request.humedadAmbiental());
         lectura.setSimulada(true); lectura.setRegistradaPor(usuario);
         return mapear(lecturas.save(lectura));
     }
-    private LecturaResponse mapear(LecturaHuerto l) { return new LecturaResponse(l.getId(), l.getHumedad(), l.getTemperatura(), l.getSector() == null ? null : l.getSector().getId(), l.getSector() == null ? null : l.getSector().getNombre(), l.isSimulada(), l.getFechaRegistro()); }
+    private LecturaResponse mapear(LecturaHuerto l) { return new LecturaResponse(l.getId(), l.getHumedad(), l.getTemperatura(), l.getSector() == null ? null : l.getSector().getId(), l.getSector() == null ? null : l.getSector().getNombre(), l.isSimulada(), l.getFechaRegistro(), l.getHumedadAmbiental()); }
 }

@@ -11,6 +11,9 @@ public class Tarea {
     @Column(nullable = false, length = 140) private String titulo;
     @Column(nullable = false, length = 1000) private String descripcion;
     @Column(name = "fecha_limite", nullable = false) private LocalDate fechaLimite;
+    @Enumerated(EnumType.STRING) @Column(length = 30) private TipoTarea tipo;
+    public TipoTarea getTipo() { return tipo == null ? TipoTarea.OBSERVACION : tipo; }
+    public void setTipo(TipoTarea tipo) { this.tipo = tipo; }
     @Enumerated(EnumType.STRING) @Column(nullable = false, length = 30) private EstadoTarea estado = EstadoTarea.PENDIENTE;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "sector_id", nullable = false) private Sector sector;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "cultivo_id") private Cultivo cultivo;

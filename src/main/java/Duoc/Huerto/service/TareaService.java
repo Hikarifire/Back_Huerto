@@ -6,6 +6,7 @@ import Duoc.Huerto.entity.*;
 import Duoc.Huerto.exception.ReglaNegocioException;
 import Duoc.Huerto.exception.RecursoNoEncontradoException;
 import Duoc.Huerto.repository.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -47,9 +48,12 @@ public class TareaService {
 
     @Transactional
     public TareaResponse actualizar(Long id, TareaRequest request) {
-        Tarea tarea = buscar(id);
+        Tarea tarea = buscarParaActualizar(id);
+        if (tarea.getEstado() == EstadoTarea.EN_REVISION || tarea.getEstado() == EstadoTarea.APROBADA) {
+            throw new ReglaNegocioException("La tarea está en revisión o ya fue validada.");
+        }
         if (!tarea.getEstudiante().getId().equals(request.estudianteId())) {
-            evidencias.deleteAllByTareaId(id);
+            if (evidencias.existsByTareaId(id)) throw new ReglaNegocioException("La tarea ya tiene historial de entregas.");
             tarea.setEstado(EstadoTarea.PENDIENTE);
         }
         aplicar(tarea, request);
@@ -58,9 +62,26 @@ public class TareaService {
 
     @Transactional
     public void eliminar(Long id) {
-        Tarea tarea = buscar(id);
-        evidencias.deleteAllByTareaId(id);
+        Tarea tarea = buscarParaActualizar(id);
+        if (evidencias.existsByTareaId(id)) throw new ReglaNegocioException("La tarea tiene evidencias que deben conservarse.");
         tareas.delete(tarea);
+    }
+
+    @Transactional
+    public TareaResponse iniciar(Long id, String correo) {
+        Tarea tarea = buscarParaActualizar(id);
+        Usuario alumno = buscarUsuario(correo);
+        if (alumno.getTipoCuenta() != TipoCuenta.ALUMNO) throw new AccessDeniedException("Solo estudiantes.");
+        validarAcceso(tarea, alumno);
+        if (tarea.getEstado() != EstadoTarea.PENDIENTE && tarea.getEstado() != EstadoTarea.RECHAZADA) {
+            throw new ReglaNegocioException("La tarea ya está iniciada o fue entregada.");
+        }
+        tarea.setEstado(EstadoTarea.EN_DESARROLLO);
+        return mapear(tarea);
+    }
+
+    private Tarea buscarParaActualizar(Long id) {
+        return tareas.buscarParaActualizar(id).orElseThrow(() -> new RecursoNoEncontradoException("Tarea no encontrada."));
     }
 
     private void aplicar(Tarea tarea, TareaRequest request) {
@@ -73,12 +94,13 @@ public class TareaService {
             if (!cultivo.getSector().getId().equals(sector.getId())) throw new ReglaNegocioException("El cultivo seleccionado no pertenece al sector indicado.");
         }
         tarea.setTitulo(request.titulo().trim()); tarea.setDescripcion(request.descripcion().trim());
+        tarea.setTipo(request.tipo() == null ? TipoTarea.OBSERVACION : request.tipo());
         tarea.setFechaLimite(request.fechaLimite()); tarea.setSector(sector); tarea.setCultivo(cultivo); tarea.setEstudiante(estudiante);
     }
 
     private void validarAcceso(Tarea tarea, Usuario usuario) {
         if (usuario.getTipoCuenta() == TipoCuenta.ALUMNO && !tarea.getEstudiante().getId().equals(usuario.getId())) {
-            throw new ReglaNegocioException("No tienes permiso para consultar esta tarea.");
+            throw new AccessDeniedException("No tienes permiso para consultar esta tarea.");
         }
     }
     private Usuario buscarUsuario(String correo) { return usuarios.findByCorreoIgnoreCase(correo).orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado.")); }
@@ -87,6 +109,6 @@ public class TareaService {
         return new TareaResponse(t.getId(), t.getTitulo(), t.getDescripcion(), t.getFechaLimite(), t.getEstado(),
             t.getSector().getId(), t.getSector().getNombre(), t.getCultivo() == null ? null : t.getCultivo().getId(),
             t.getCultivo() == null ? null : t.getCultivo().getNombre(), t.getEstudiante().getId(),
-            t.getEstudiante().getNombre(), t.getCreadoPor().getId(), t.getFechaCreacion());
+            t.getEstudiante().getNombre(), t.getCreadoPor().getId(), t.getFechaCreacion(), t.getTipo());
     }
 }

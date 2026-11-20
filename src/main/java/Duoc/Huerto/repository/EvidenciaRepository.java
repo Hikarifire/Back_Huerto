@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface EvidenciaRepository extends JpaRepository<Evidencia, Long> {
     List<Evidencia> findAllByTareaIdOrderByFechaRegistroDesc(Long tareaId);
     Optional<Evidencia> findByIdAndTareaEstudianteId(Long id, Long estudianteId);
-    void deleteAllByTareaId(Long tareaId);
+    boolean existsByTareaId(Long tareaId);
 }

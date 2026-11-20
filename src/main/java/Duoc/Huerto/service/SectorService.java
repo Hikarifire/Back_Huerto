@@ -27,12 +27,20 @@ public class SectorService {
     @Transactional
     public SectorResponse crear(SectorRequest request) {
         if (sectores.existsByNombreIgnoreCase(request.nombre().trim())) throw new ReglaNegocioException("Ya existe un sector con ese nombre.");
-        return mapear(sectores.save(new Sector(request.nombre().trim(), request.ubicacion(), request.descripcion())));
+        Sector sector = new Sector(request.nombre().trim(), request.ubicacion().trim(), request.descripcion());
+        if (request.activo() != null) sector.setActivo(request.activo());
+        return mapear(sectores.save(sector));
     }
     @Transactional
     public SectorResponse actualizar(Long id, SectorRequest request) {
         Sector sector = buscar(id);
-        sector.setNombre(request.nombre().trim()); sector.setUbicacion(request.ubicacion()); sector.setDescripcion(request.descripcion());
+        if (sectores.existsByNombreIgnoreCaseAndIdNot(request.nombre().trim(), id)) {
+            throw new ReglaNegocioException("Ya existe un sector con ese nombre.");
+        }
+        sector.setNombre(request.nombre().trim());
+        sector.setUbicacion(request.ubicacion().trim());
+        sector.setDescripcion(request.descripcion());
+        if (request.activo() != null) sector.setActivo(request.activo());
         return mapear(sectores.save(sector));
     }
     @Transactional

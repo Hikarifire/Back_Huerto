@@ -8,5 +8,5 @@ import java.math.BigDecimal;
 public record LecturaRequest(
     @NotNull @DecimalMin("0.0") @DecimalMax("100.0") BigDecimal humedad,
     @NotNull @DecimalMin("-20.0") @DecimalMax("60.0") BigDecimal temperatura,
-    Long sectorId
+    Long sectorId, @DecimalMin("0.0") @DecimalMax("100.0") BigDecimal humedadAmbiental
 ) {}

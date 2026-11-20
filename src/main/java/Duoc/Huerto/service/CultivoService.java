@@ -43,10 +43,21 @@ public class CultivoService {
     }
     private void aplicar(Cultivo c, CultivoRequest r) {
         Sector sector = sectores.findById(r.sectorId()).orElseThrow(() -> new RecursoNoEncontradoException("Sector no encontrado."));
-        if (r.fechaSiembra() != null && r.fechaCosechaEstimada() != null && r.fechaCosechaEstimada().isBefore(r.fechaSiembra())) throw new ReglaNegocioException("La fecha estimada de cosecha no puede ser anterior a la siembra.");
+        if (r.fechaCosechaEstimada() != null && r.fechaCosechaEstimada().isBefore(r.fechaSiembra())) {
+            throw new ReglaNegocioException("La fecha estimada de cosecha no puede ser anterior a la siembra.");
+        }
+        if (r.fechaTrasplante() != null && (r.fechaTrasplante().isBefore(r.fechaSiembra())
+            || (r.fechaCosechaEstimada() != null && r.fechaTrasplante().isAfter(r.fechaCosechaEstimada())))) {
+            throw new ReglaNegocioException("El trasplante debe quedar entre la siembra y la cosecha.");
+        }
+        if (c.getId() != null && !c.getSector().getId().equals(sector.getId()) && tareas.existsByCultivoId(c.getId())) {
+            throw new ReglaNegocioException("El cultivo tiene tareas asociadas y no puede cambiar de sector.");
+        }
+        c.setFechaTrasplante(r.fechaTrasplante());
+        c.setFrecuenciaRiegoDias(r.frecuenciaRiegoDias() == null ? 1 : r.frecuenciaRiegoDias());
         c.setNombre(r.nombre().trim()); c.setTipo(r.tipo()); c.setDescripcion(r.descripcion()); c.setFechaSiembra(r.fechaSiembra());
         c.setFechaCosechaEstimada(r.fechaCosechaEstimada()); c.setEstado(r.estado() == null ? EstadoCultivo.SEMBRADO : r.estado()); c.setSector(sector);
     }
     private Cultivo buscar(Long id) { return cultivos.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Cultivo no encontrado.")); }
-    private CultivoResponse mapear(Cultivo c) { return new CultivoResponse(c.getId(), c.getNombre(), c.getTipo(), c.getDescripcion(), c.getFechaSiembra(), c.getFechaCosechaEstimada(), c.getEstado(), c.getSector().getId(), c.getSector().getNombre()); }
+    private CultivoResponse mapear(Cultivo c) { return new CultivoResponse(c.getId(), c.getNombre(), c.getTipo(), c.getDescripcion(), c.getFechaSiembra(), c.getFechaCosechaEstimada(), c.getEstado(), c.getSector().getId(), c.getSector().getNombre(), c.getFechaTrasplante(), c.getFrecuenciaRiegoDias()); }
 }

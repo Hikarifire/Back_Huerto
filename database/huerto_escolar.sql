@@ -1,5 +1,5 @@
 -- Esquema MySQL para Huerto Escolar.
--- Ejecutar en MySQL Workbench antes de iniciar Spring Boot.
+-- Importar desde phpMyAdmin de XAMPP antes de iniciar Spring Boot.
 -- Las entidades JPA mantienen este esquema con spring.jpa.hibernate.ddl-auto=update.
 CREATE DATABASE IF NOT EXISTS huerto_escolar
   CHARACTER SET utf8mb4
@@ -106,3 +106,6 @@ CREATE TABLE IF NOT EXISTS lecturas_huerto (
   CONSTRAINT fk_lectura_usuario FOREIGN KEY (registrada_por_id) REFERENCES usuarios(id),
   INDEX idx_lectura_fecha (fecha_registro)
 ) ENGINE=InnoDB;
+
+-- El servidor añade automáticamente las columnas y tablas de la versión actual
+-- al iniciar con MySQL. Las tablas anteriores se conservan en bases existentes.

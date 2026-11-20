@@ -1,5 +1,6 @@
 package Duoc.Huerto.dto;
 
+import Duoc.Huerto.entity.TipoTarea;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -11,5 +12,5 @@ public record TareaRequest(
     @NotNull LocalDate fechaLimite,
     @NotNull Long sectorId,
     Long cultivoId,
-    @NotNull Long estudianteId
+    @NotNull Long estudianteId, TipoTarea tipo
 ) {}

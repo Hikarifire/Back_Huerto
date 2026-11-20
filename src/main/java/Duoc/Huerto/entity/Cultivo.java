@@ -12,6 +12,12 @@ public class Cultivo {
     @Column(length = 500) private String descripcion;
     @Column(name = "fecha_siembra") private LocalDate fechaSiembra;
     @Column(name = "fecha_cosecha_estimada") private LocalDate fechaCosechaEstimada;
+    @Column(name = "fecha_trasplante") private LocalDate fechaTrasplante;
+    @Column(name = "frecuencia_riego_dias") private Integer frecuenciaRiegoDias;
+    public LocalDate getFechaTrasplante() { return fechaTrasplante; }
+    public void setFechaTrasplante(LocalDate fecha) { fechaTrasplante = fecha; }
+    public Integer getFrecuenciaRiegoDias() { return frecuenciaRiegoDias; }
+    public void setFrecuenciaRiegoDias(Integer dias) { frecuenciaRiegoDias = dias; }
     @Enumerated(EnumType.STRING) @Column(nullable = false, length = 30) private EstadoCultivo estado = EstadoCultivo.SEMBRADO;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "sector_id", nullable = false) private Sector sector;
     public Cultivo() {}

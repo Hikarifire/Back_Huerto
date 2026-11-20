@@ -21,6 +21,11 @@ public class TareaController {
     public TareaResponse crear(@Valid @RequestBody TareaRequest request, Principal principal) { return service.crear(request, principal.getName()); }
     @PutMapping("/{id}") @PreAuthorize("hasRole('DOCENTE')")
     public TareaResponse actualizar(@PathVariable Long id, @Valid @RequestBody TareaRequest request) { return service.actualizar(id, request); }
+    @PostMapping("/{id}/iniciar")
+    @PreAuthorize("hasRole('ALUMNO')")
+    public TareaResponse iniciar(@PathVariable Long id, Principal principal) {
+        return service.iniciar(id, principal.getName());
+    }
     @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasRole('DOCENTE')")
     public void eliminar(@PathVariable Long id) { service.eliminar(id); }
 }

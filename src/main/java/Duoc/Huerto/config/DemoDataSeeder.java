@@ -36,18 +36,18 @@ public class DemoDataSeeder implements CommandLineRunner {
         Sector sector = sectores.findAll().stream().findFirst().orElseGet(() -> sectores.save(new Sector("Invernadero", "Patio escolar", "Sector de demostración del huerto.")));
         Cultivo cultivo = cultivos.findAll().stream().findFirst().orElseGet(() -> {
             Cultivo c = new Cultivo(); c.setNombre("Lechuga"); c.setTipo("Hortaliza"); c.setDescripcion("Cultivo de demostración.");
-            c.setFechaSiembra(LocalDate.now()); c.setFechaCosechaEstimada(LocalDate.now().plusDays(60)); c.setEstado(EstadoCultivo.SEMBRADO); c.setSector(sector);
+            c.setFrecuenciaRiegoDias(3); c.setFechaSiembra(LocalDate.now()); c.setFechaCosechaEstimada(LocalDate.now().plusDays(60)); c.setEstado(EstadoCultivo.SEMBRADO); c.setSector(sector);
             return cultivos.save(c);
         });
         if (tareas.count() == 0) {
             Tarea tarea = new Tarea(); tarea.setTitulo("Revisar el crecimiento de la lechuga");
             tarea.setDescripcion("Observar las hojas, registrar cambios y adjuntar una fotografía.");
-            tarea.setFechaLimite(LocalDate.now().plusDays(7)); tarea.setEstado(EstadoTarea.PENDIENTE);
+            tarea.setTipo(TipoTarea.OBSERVACION); tarea.setFechaLimite(LocalDate.now().plusDays(7)); tarea.setEstado(EstadoTarea.PENDIENTE);
             tarea.setSector(sector); tarea.setCultivo(cultivo); tarea.setEstudiante(alumno1); tarea.setCreadoPor(docente); tareas.save(tarea);
         }
         if (lecturas.count() == 0) {
             LecturaHuerto lectura = new LecturaHuerto(); lectura.setHumedad(new BigDecimal("62.00")); lectura.setTemperatura(new BigDecimal("21.50"));
-            lectura.setSector(sector); lectura.setSimulada(true); lectura.setRegistradaPor(docente); lecturas.save(lectura);
+            lectura.setHumedadAmbiental(new BigDecimal("56.00")); lectura.setSector(sector); lectura.setSimulada(true); lectura.setRegistradaPor(docente); lecturas.save(lectura);
         }
     }
 

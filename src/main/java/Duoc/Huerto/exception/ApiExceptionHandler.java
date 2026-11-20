@@ -6,6 +6,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -49,6 +51,16 @@ public class ApiExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> argumento(IllegalArgumentException ex, HttpServletRequest req) {
         return respuesta(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiError> fotoDemasiadoGrande(MaxUploadSizeExceededException ex, HttpServletRequest req) {
+        return respuesta(HttpStatus.valueOf(413), "La fotografía no puede superar 5 MB.", req);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> formatoInvalido(HttpMessageNotReadableException ex, HttpServletRequest req) {
+        return respuesta(HttpStatus.BAD_REQUEST, "Revisa el formato de los datos enviados.", req);
     }
 
     private ResponseEntity<ApiError> respuesta(HttpStatus status, String mensaje, HttpServletRequest req) {

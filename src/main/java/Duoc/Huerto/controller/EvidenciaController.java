@@ -5,6 +5,10 @@ import Duoc.Huerto.dto.RevisionEvidenciaRequest;
 import Duoc.Huerto.service.EvidenciaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaTypeFactory;
+import org.springframework.http.MediaType;
+import org.springframework.core.io.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +30,13 @@ public class EvidenciaController {
 
     @GetMapping("/api/tareas/{tareaId}/evidencias")
     public List<EvidenciaResponse> listar(@PathVariable Long tareaId, Principal principal) { return service.listarDeTarea(tareaId, principal.getName()); }
+
+    @GetMapping("/api/evidencias/{id}/foto")
+    public ResponseEntity<Resource> foto(@PathVariable Long id, Principal principal) {
+        Resource imagen = service.obtenerFoto(id, principal.getName());
+        return ResponseEntity.ok().contentType(MediaTypeFactory.getMediaType(imagen)
+            .orElse(MediaType.APPLICATION_OCTET_STREAM)).body(imagen);
+    }
 
     @PostMapping("/api/evidencias/{id}/revision")
     @PreAuthorize("hasRole('DOCENTE')")

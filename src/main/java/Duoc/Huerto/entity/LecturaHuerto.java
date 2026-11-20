@@ -14,6 +14,9 @@ public class LecturaHuerto {
     @Column(nullable = false) private boolean simulada = true;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "registrada_por_id") private Usuario registradaPor;
     @Column(name = "fecha_registro", nullable = false) private LocalDateTime fechaRegistro;
+    @Column(name = "humedad_ambiental", precision = 5, scale = 2) private BigDecimal humedadAmbiental;
+    public BigDecimal getHumedadAmbiental() { return humedadAmbiental; }
+    public void setHumedadAmbiental(BigDecimal humedad) { humedadAmbiental = humedad; }
     @PrePersist void antesDeGuardar() { if (fechaRegistro == null) fechaRegistro = LocalDateTime.now(); }
     public LecturaHuerto() {}
     public Long getId() { return id; }
