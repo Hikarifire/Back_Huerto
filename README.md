@@ -1,7 +1,7 @@
 # Huerto Escolar API
 
 API Spring Boot con Java 21 y MySQL 8.4. Integrantes: Giovanni Orellana y Vicente Vilches.
-<
+
 ## Ejecutar con XAMPP
 
 1. En el panel de XAMPP, inicia **MySQL**. Si vas a usar phpMyAdmin, inicia también Apache.
