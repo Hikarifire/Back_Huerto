@@ -36,7 +36,7 @@ public class ReporteController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('DOCENTE')")
+    @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public ReporteService.Resumen actualizar(@PathVariable Long id, @Valid @RequestBody Seguimiento request,
                                              Principal principal) {
         return service.actualizar(id, principal.getName(), request.estado(), request.seguimiento());

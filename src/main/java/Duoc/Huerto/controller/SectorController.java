@@ -16,10 +16,10 @@ public class SectorController {
     public SectorController(SectorService service) { this.service = service; }
     @GetMapping public List<SectorResponse> listar() { return service.listar(); }
     @GetMapping("/{id}") public SectorResponse obtener(@PathVariable Long id) { return service.obtener(id); }
-    @PostMapping @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasRole('DOCENTE')")
+    @PostMapping @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public SectorResponse crear(@Valid @RequestBody SectorRequest request) { return service.crear(request); }
-    @PutMapping("/{id}") @PreAuthorize("hasRole('DOCENTE')")
+    @PutMapping("/{id}") @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public SectorResponse actualizar(@PathVariable Long id, @Valid @RequestBody SectorRequest request) { return service.actualizar(id, request); }
-    @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasRole('DOCENTE')")
+    @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public void eliminar(@PathVariable Long id) { service.eliminar(id); }
 }

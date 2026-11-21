@@ -16,6 +16,6 @@ public class LecturaController {
     private final LecturaService service;
     public LecturaController(LecturaService service) { this.service = service; }
     @GetMapping public List<LecturaResponse> listar() { return service.listar(); }
-    @PostMapping("/simuladas") @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasRole('DOCENTE')")
+    @PostMapping("/simuladas") @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public LecturaResponse crearSimulada(@Valid @RequestBody LecturaRequest request, Principal principal) { return service.crearSimulada(request, principal.getName()); }
 }

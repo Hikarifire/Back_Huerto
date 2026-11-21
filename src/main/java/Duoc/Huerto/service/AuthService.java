@@ -7,6 +7,9 @@ import Duoc.Huerto.exception.ReglaNegocioException;
 import Duoc.Huerto.exception.CredencialesInvalidasException;
 import Duoc.Huerto.exception.RecursoNoEncontradoException;
 import Duoc.Huerto.repository.UsuarioRepository;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +26,29 @@ public class AuthService {
 
     @Transactional
     public AuthResponse registrar(RegistroRequest request) {
-        String correo = request.correo().trim().toLowerCase();
-        if (usuarios.existsByCorreoIgnoreCase(correo)) throw new ReglaNegocioException("Ya existe una cuenta registrada con ese correo.");
-        Usuario usuario = new Usuario(request.nombre().trim(), correo, passwordEncoder.encode(request.password()), TipoCuenta.ALUMNO);
-        usuario = usuarios.save(usuario);
-        return respuesta(usuario);
+        return respuesta(crearUsuario(request, TipoCuenta.ALUMNO));
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public UsuarioResponse crearCuenta(RegistroRequest request, TipoCuenta rol) {
+        if (rol == TipoCuenta.ADMIN) {
+            throw new IllegalArgumentException("Selecciona el rol docente o estudiante.");
+        }
+        return mapear(crearUsuario(request, rol));
+    }
+
+    private Usuario crearUsuario(RegistroRequest request, TipoCuenta rol) {
+        String correo = request.correo().trim().toLowerCase(Locale.ROOT);
+        if (usuarios.existsByCorreoIgnoreCase(correo)) {
+            throw new ReglaNegocioException("Ya existe una cuenta registrada con ese correo.");
+        }
+        if (request.password().getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new IllegalArgumentException("La contraseña supera el límite de 72 bytes.");
+        }
+        Usuario usuario = new Usuario(request.nombre().trim(), correo,
+            passwordEncoder.encode(request.password()), rol);
+        return usuarios.save(usuario);
     }
 
     @Transactional

@@ -1,6 +1,6 @@
 # Huerto Escolar API
 
-API Spring Boot con Java 21 y MySQL 8.4. Integrantes: Giovanni Orellana y Vicente Vilches.
+API Spring Boot con Java 21 y la base de datos de XAMPP. Integrantes: Giovanni Orellana y Vicente Vilches.
 
 ## Ejecutar con XAMPP
 
@@ -17,6 +17,21 @@ API Spring Boot con Java 21 y MySQL 8.4. Integrantes: Giovanni Orellana y Vicent
 La configuración local predeterminada usa `localhost:3306`, el usuario `root` y una contraseña vacía. Si tu instalación difiere, ajusta `DB_URL`, `DB_USERNAME` y `DB_PASSWORD` en las variables de entorno de IntelliJ o en la terminal. La URL debe apuntar a la base `huerto_escolar`.
 
 Ejecuta `./mvnw test` o `.\mvnw.cmd test` para correr las pruebas.
+
+## Crear el primer administrador
+
+1. Si ya tienes una instalación anterior, revisa el tipo de `usuarios.tipo_cuenta` en phpMyAdmin. Si aparece como `ENUM`, ejecuta `database/actualizar_rol_admin.sql` en la base existente. El script conserva los roles ya asignados.
+2. En IntelliJ, abre **Run → Edit Configurations → Environment variables**. Agrega `HUERTO_ADMIN_PASSWORD` con una contraseña que elijas de al menos 12 caracteres y hasta 72 bytes. Si usas PowerShell, establece la variable de entorno en la misma sesión que levanta Spring Boot.
+3. Arranca el backend. Ingresa a la app con `admin@huerto.cl` y la contraseña que configuraste. En **Más → Gestionar cuentas**, elige si quieres crear un docente o un estudiante.
+4. Después de comprobar el inicio de sesión, puedes quitar `HUERTO_ADMIN_PASSWORD` de la configuración de arranque. La cuenta queda en la base y la contraseña se conserva como hash BCrypt. Volver a definir la variable no cambia la contraseña de una cuenta existente.
+
+Si el correo `admin@huerto.cl` ya está ocupado por una cuenta de otro rol, el arranque con la variable configurada informa el conflicto y conserva la cuenta existente. El registro público crea cuentas de estudiante.
+
+| Rol | Permisos |
+|---|---|
+| `ADMIN` | Crea cuentas docentes y de estudiantes. Incluye la gestión del huerto habilitada para docentes. |
+| `DOCENTE` | Gestiona sectores, cultivos, tareas, revisiones, reportes y lecturas simuladas. |
+| `ALUMNO` | Gestiona sus propias tareas asignadas, evidencias y reportes según las reglas del huerto. |
 
 ## Cuentas de demostración
 
@@ -36,6 +51,7 @@ Android usa Kotlin, Jetpack Compose, MVVM, StateFlow, Room y Retrofit. MySQL alm
 | Componente | Operaciones |
 |---|---|
 | Sesiones | `POST /api/auth/login`, `POST /api/auth/registro`, `GET /api/auth/me`, `POST /api/auth/logout` |
+| Alta de cuentas | `POST /api/usuarios/cuentas/DOCENTE` y `POST /api/usuarios/cuentas/ALUMNO`, solo `ADMIN` |
 | Usuarios | `GET /api/usuarios/estudiantes` |
 | Sectores, cultivos y tareas | `GET/POST /api/{recurso}`, `GET/PUT/DELETE /api/{recurso}/{id}` |
 | Tareas y evidencias | `POST /api/tareas/{id}/iniciar`, `GET/POST /api/tareas/{id}/evidencias`, `POST /api/evidencias/{id}/revision`, `GET /api/evidencias/{id}/foto` |

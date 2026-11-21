@@ -39,7 +39,7 @@ public class EvidenciaController {
     }
 
     @PostMapping("/api/evidencias/{id}/revision")
-    @PreAuthorize("hasRole('DOCENTE')")
+    @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public EvidenciaResponse revisar(@PathVariable Long id, @Valid @RequestBody RevisionEvidenciaRequest request, Principal principal) {
         return service.revisar(id, principal.getName(), request.aprobada(), request.observacion());
     }

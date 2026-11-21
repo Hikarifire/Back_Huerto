@@ -36,7 +36,7 @@ public class ReporteService {
     @Transactional(readOnly = true)
     public List<Resumen> listar(String correo) {
         Usuario usuario = usuario(correo);
-        List<Reporte> visibles = usuario.getTipoCuenta() == TipoCuenta.DOCENTE
+        List<Reporte> visibles = usuario.getTipoCuenta().puedeGestionarHuerto()
             ? reportes.findAllByOrderByCreadoEnDesc()
             : reportes.findAllByAutorIdOrderByCreadoEnDesc(usuario.getId());
         return visibles.stream().map(this::mapear).toList();
@@ -65,7 +65,7 @@ public class ReporteService {
     @Transactional
     public Resumen actualizar(Long id, String correo, Reporte.Estado estado, String seguimiento) {
         Usuario docente = usuario(correo);
-        if (docente.getTipoCuenta() != TipoCuenta.DOCENTE) throw new AccessDeniedException("Solo docentes.");
+        if (!docente.getTipoCuenta().puedeGestionarHuerto()) throw new AccessDeniedException("Solo docentes o administradores.");
         Reporte reporte = buscar(id);
         reporte.estado = estado;
         reporte.seguimiento = seguimiento.trim();
@@ -78,7 +78,7 @@ public class ReporteService {
     public Resource foto(Long id, String correo) {
         Reporte reporte = buscar(id);
         Usuario usuario = usuario(correo);
-        if (reporte.foto == null || (usuario.getTipoCuenta() != TipoCuenta.DOCENTE
+        if (reporte.foto == null || (!usuario.getTipoCuenta().puedeGestionarHuerto()
             && !reporte.autor.getId().equals(usuario.getId()))) {
             throw new RecursoNoEncontradoException("Fotografía no encontrada.");
         }

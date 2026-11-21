@@ -26,7 +26,7 @@ public class TareaService {
     @Transactional(readOnly = true)
     public List<TareaResponse> listarPara(String correo) {
         Usuario usuario = buscarUsuario(correo);
-        List<Tarea> lista = usuario.getTipoCuenta() == TipoCuenta.DOCENTE
+        List<Tarea> lista = usuario.getTipoCuenta().puedeGestionarHuerto()
             ? tareas.findAllByOrderByFechaLimiteAsc()
             : tareas.findAllByEstudianteIdOrderByFechaLimiteAsc(usuario.getId());
         return lista.stream().map(this::mapear).toList();
@@ -41,7 +41,7 @@ public class TareaService {
     @Transactional
     public TareaResponse crear(TareaRequest request, String correoDocente) {
         Usuario docente = buscarUsuario(correoDocente);
-        if (docente.getTipoCuenta() != TipoCuenta.DOCENTE) throw new ReglaNegocioException("Solo un docente puede crear tareas.");
+        if (!docente.getTipoCuenta().puedeGestionarHuerto()) throw new ReglaNegocioException("Solo un docente o administrador puede crear tareas.");
         Tarea tarea = new Tarea(); tarea.setCreadoPor(docente); aplicar(tarea, request);
         return mapear(tareas.save(tarea));
     }

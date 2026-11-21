@@ -53,7 +53,7 @@ public class EvidenciaService {
     @Transactional
     public EvidenciaResponse revisar(Long evidenciaId, String correoDocente, boolean aprobada, String observacion) {
         Usuario docente = buscarUsuario(correoDocente);
-        if (docente.getTipoCuenta() != TipoCuenta.DOCENTE) throw new ReglaNegocioException("Solo un docente puede revisar evidencias.");
+        if (!docente.getTipoCuenta().puedeGestionarHuerto()) throw new ReglaNegocioException("Solo un docente o administrador puede revisar evidencias.");
         Evidencia evidencia = evidencias.findById(evidenciaId).orElseThrow(() -> new RecursoNoEncontradoException("Evidencia no encontrada."));
         Tarea tarea = tareas.buscarParaActualizar(evidencia.getTarea().getId())
             .orElseThrow(() -> new RecursoNoEncontradoException("Tarea no encontrada."));
@@ -73,7 +73,7 @@ public class EvidenciaService {
     @Transactional(readOnly = true)
     public FileSystemResource obtenerFoto(Long id, String correo) {
         Usuario usuario = buscarUsuario(correo);
-        Evidencia evidencia = (usuario.getTipoCuenta() == TipoCuenta.DOCENTE
+        Evidencia evidencia = (usuario.getTipoCuenta().puedeGestionarHuerto()
             ? evidencias.findById(id)
             : evidencias.findByIdAndTareaEstudianteId(id, usuario.getId()))
             .orElseThrow(() -> new RecursoNoEncontradoException("Fotografía no encontrada."));

@@ -16,10 +16,10 @@ public class CultivoController {
     public CultivoController(CultivoService service) { this.service = service; }
     @GetMapping public List<CultivoResponse> listar(@RequestParam(required = false) Long sectorId) { return service.listar(sectorId); }
     @GetMapping("/{id}") public CultivoResponse obtener(@PathVariable Long id) { return service.obtener(id); }
-    @PostMapping @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasRole('DOCENTE')")
+    @PostMapping @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public CultivoResponse crear(@Valid @RequestBody CultivoRequest request) { return service.crear(request); }
-    @PutMapping("/{id}") @PreAuthorize("hasRole('DOCENTE')")
+    @PutMapping("/{id}") @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public CultivoResponse actualizar(@PathVariable Long id, @Valid @RequestBody CultivoRequest request) { return service.actualizar(id, request); }
-    @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasRole('DOCENTE')")
+    @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public void eliminar(@PathVariable Long id) { service.eliminar(id); }
 }

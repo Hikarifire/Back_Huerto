@@ -17,15 +17,15 @@ public class TareaController {
     public TareaController(TareaService service) { this.service = service; }
     @GetMapping public List<TareaResponse> listar(Principal principal) { return service.listarPara(principal.getName()); }
     @GetMapping("/{id}") public TareaResponse obtener(@PathVariable Long id, Principal principal) { return service.obtener(id, principal.getName()); }
-    @PostMapping @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasRole('DOCENTE')")
+    @PostMapping @ResponseStatus(HttpStatus.CREATED) @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public TareaResponse crear(@Valid @RequestBody TareaRequest request, Principal principal) { return service.crear(request, principal.getName()); }
-    @PutMapping("/{id}") @PreAuthorize("hasRole('DOCENTE')")
+    @PutMapping("/{id}") @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public TareaResponse actualizar(@PathVariable Long id, @Valid @RequestBody TareaRequest request) { return service.actualizar(id, request); }
     @PostMapping("/{id}/iniciar")
     @PreAuthorize("hasRole('ALUMNO')")
     public TareaResponse iniciar(@PathVariable Long id, Principal principal) {
         return service.iniciar(id, principal.getName());
     }
-    @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasRole('DOCENTE')")
+    @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) @PreAuthorize("hasAnyRole('DOCENTE','ADMIN')")
     public void eliminar(@PathVariable Long id) { service.eliminar(id); }
 }
